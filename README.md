@@ -36,6 +36,10 @@ Ubique su terminal dentro del directorio `docker`:
 cd ~/justina_hardware/docker
 ```
 
+Si no tienes docker, instálalo con:
+
+sudo apt install docker.io
+
 Construya y exporte la imagen con:
 
 ```bash
