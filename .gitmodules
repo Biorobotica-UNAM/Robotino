@@ -1,0 +1,28 @@
+[submodule "src/arms"]
+	path = src/arms
+	url = git@github.com:Biorobotica-UNAM/arms.git
+	branch = dev/publisher_redundante
+[submodule "src/base"]
+	path = src/base
+	url = git@github.com:Biorobotica-UNAM/base.git
+	branch = main
+[submodule "src/gui"]
+	path = src/gui
+	url = git@github.com:Biorobotica-UNAM/gui.git
+	branch = main
+[submodule "src/head"]
+	path = src/head
+	url = git@github.com:Biorobotica-UNAM/head.git
+	branch = dev/publisher_redundante
+[submodule "src/Interfaces"]
+	path = src/Interfaces
+	url = git@github.com:Biorobotica-UNAM/Interfaces.git
+	branch = dev/supervisor_interfaces
+[submodule "src/justina_description"]
+	path = src/justina_description
+	url = git@github.com:Biorobotica-UNAM/justina_description.git
+	branch = fix/cleanup
+[submodule "src/torso"]
+	path = src/torso
+	url = git@github.com:Biorobotica-UNAM/torso.git
+	branch = dev/publisher_redundante

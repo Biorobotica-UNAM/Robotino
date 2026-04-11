@@ -1,0 +1,172 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Mexico_City
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+SHELL ["/bin/bash", "-c"]
+
+# ------------------------------------------------------------------
+# Variables globales ROS / DDS
+# ------------------------------------------------------------------
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DOMAIN_ID=0
+ENV ROS_LOCALHOST_ONLY=0
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml
+
+# ------------------------------------------------------------------
+# Base del sistema
+# ------------------------------------------------------------------
+RUN apt-get update && apt-get install -y \
+    locales \
+    tzdata \
+    software-properties-common \
+    curl \
+    gnupg2 \
+    lsb-release \
+    sudo \
+    bash-completion \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    vim \
+    nano \
+    less \
+    file \
+    iproute2 \
+    iputils-ping \
+    net-tools \
+    usbutils \
+    udev \
+    can-utils \
+    libserial-dev \
+    python3-pip \
+    python3-argcomplete \
+    espeak-ng \
+    nlohmann-json3-dev \
+    portaudio19-dev \
+    flite \
+    procps \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+
+# ------------------------------------------------------------------
+# Repositorio oficial ROS 2
+# ------------------------------------------------------------------
+RUN add-apt-repository universe && \
+    apt-get update && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+      -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" \
+      > /etc/apt/sources.list.d/ros2.list
+
+# ------------------------------------------------------------------
+# ROS 2 Jazzy + herramientas base
+# ------------------------------------------------------------------
+RUN apt-get update && apt-get install -y \
+    ros-dev-tools \
+    ros-jazzy-desktop \
+    ros-jazzy-rmw-cyclonedds-cpp \
+    ros-jazzy-control-msgs \
+    ros-jazzy-urg-node \
+    ros-jazzy-nav2-map-server \
+    ros-jazzy-nav2-amcl \
+    ros-jazzy-xacro \
+    ros-jazzy-nav2-lifecycle-manager \
+    ros-jazzy-depth-image-proc \
+    ros-jazzy-camera-info-manager \
+    ros-jazzy-tf-transformations \
+    ros-jazzy-dynamixel-sdk \
+    && rm -rf /var/lib/apt/lists/*
+
+# ------------------------------------------------------------------
+# Herramientas extra por pip
+# ------------------------------------------------------------------
+RUN python3 -m pip install --break-system-packages -U \
+    colcon-common-extensions \
+    vcstool
+
+# ------------------------------------------------------------------
+# rosdep (opcional por ahora, no lo usamos en build)
+# ------------------------------------------------------------------
+RUN rosdep init || true
+
+# ------------------------------------------------------------------
+# Configuración Cyclone DDS por defecto
+# ------------------------------------------------------------------
+RUN mkdir -p /etc/cyclonedds
+COPY docker/config/cyclonedds.xml /etc/cyclonedds/cyclonedds.xml
+
+# ------------------------------------------------------------------
+# Usuario de trabajo
+# ------------------------------------------------------------------
+ARG USERNAME=robotino
+
+RUN if ! getent group ${USERNAME} >/dev/null; then \
+      groupadd ${USERNAME}; \
+    fi && \
+    if ! id -u ${USERNAME} >/dev/null 2>&1; then \
+      useradd -m -s /bin/bash -g ${USERNAME} ${USERNAME}; \
+    fi && \
+    usermod -aG sudo,dialout,plugdev,video ${USERNAME} && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# ------------------------------------------------------------------
+# Workspace dentro de la imagen
+# ------------------------------------------------------------------
+RUN mkdir -p /home/${USERNAME}/justina_hardware/src && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/justina_hardware
+
+# ------------------------------------------------------------------
+# Paquetes .deb opcionales del Robotino/Festo
+# ------------------------------------------------------------------
+COPY docker/robotino_pkgs/ /tmp/robotino_pkgs/
+
+RUN if ls /tmp/robotino_pkgs/*.deb >/dev/null 2>&1; then \
+      apt-get update && \
+      dpkg -i /tmp/robotino_pkgs/*.deb || apt-get install -f -y ; \
+      rm -rf /var/lib/apt/lists/* ; \
+    else \
+      echo "No .deb packages found in docker/robotino_pkgs"; \
+    fi
+
+# ------------------------------------------------------------------
+# Copiar src del workspace
+# ------------------------------------------------------------------
+COPY src /home/${USERNAME}/justina_hardware/src
+
+RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/justina_hardware
+
+# ------------------------------------------------------------------
+# Compilar workspace
+# NOTA:
+# - No usamos rosdep install por ahora
+# - Esto asume que tu workspace ya trae lo necesario
+#   y que las dependencias manuales arriba bastan
+# ------------------------------------------------------------------
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}/justina_hardware
+
+RUN source /opt/ros/jazzy/setup.bash && \
+    colcon build --symlink-install --event-handlers console_direct+
+
+# ------------------------------------------------------------------
+# Entrypoint
+# ------------------------------------------------------------------
+USER root
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+USER ${USERNAME}
+
+RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
+    echo "if [ -f /home/${USERNAME}/justina_hardware/install/setup.bash ]; then source /home/${USERNAME}/justina_hardware/install/setup.bash; fi" >> /home/${USERNAME}/.bashrc && \
+    echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/${USERNAME}/.bashrc && \
+    echo "export ROS_DOMAIN_ID=0" >> /home/${USERNAME}/.bashrc && \
+    echo "export ROS_LOCALHOST_ONLY=0" >> /home/${USERNAME}/.bashrc && \
+    echo "export CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml" >> /home/${USERNAME}/.bashrc
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
