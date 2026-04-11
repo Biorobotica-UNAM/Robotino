@@ -26,3 +26,7 @@
 	path = src/torso
 	url = git@github.com:Biorobotica-UNAM/torso.git
 	branch = dev/publisher_redundante
+[submodule "src/justina_hardware"]
+	path = src/justina_hardware
+	url = git@github.com:Biorobotica-UNAM/justina_hardware.git
+	branch = main
