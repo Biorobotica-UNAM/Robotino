@@ -162,6 +162,10 @@ ip link show
 
 ### 9. Activación del entorno
 
+Utilice el alias:
+
+alias justina_on='export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp; export CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml; export ROS_DOMAIN_ID=0; export ROS_LOCALHOST_ONLY=0'
+
 ```bash
 justina_on
 ```
