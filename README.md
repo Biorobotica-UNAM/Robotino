@@ -1,4 +1,4 @@
-# Justina Hardware
+# Robotino
 
 Este repositorio concentra la infraestructura necesaria para la construccion, despliegue y ejecucion del entorno de hardware de **JUSTINA** sobre **ROS 2 Jazzy**, con enfasis en la operacion del robot movil **Robotino**. Su objetivo es ofrecer un flujo de trabajo claro y reproducible para generar la imagen Docker del sistema, transferirla al robot y poner en marcha los nodos de hardware correspondientes.
 
