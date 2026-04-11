@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-IMAGE_NAME="justina_hardware:jazzy"
-ARCHIVE_NAME="justina_hardware_jazzy.tar.gz"
+IMAGE_NAME="robotino:jazzy"
+ARCHIVE_NAME="robotino_jazzy.tar.gz"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"

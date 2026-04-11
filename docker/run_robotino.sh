@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-IMAGE_NAME="justina_hardware:jazzy"
+IMAGE_NAME="robotino:jazzy"
 
 docker run --rm -it \
-  --name justina_hardware_jazzy \
+  --name robotino_jazzy \
   --network host \
   --ipc host \
   --pid host \

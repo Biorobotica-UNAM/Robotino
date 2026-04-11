@@ -117,8 +117,8 @@ RUN if ! getent group ${USERNAME} >/dev/null; then \
 # ------------------------------------------------------------------
 # Workspace dentro de la imagen
 # ------------------------------------------------------------------
-RUN mkdir -p /home/${USERNAME}/justina_hardware/src && \
-    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/justina_hardware
+RUN mkdir -p /home/${USERNAME}/Robotino/src && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Robotino
 
 # ------------------------------------------------------------------
 # Paquetes .deb opcionales del Robotino/Festo
@@ -136,9 +136,9 @@ RUN if ls /tmp/robotino_pkgs/*.deb >/dev/null 2>&1; then \
 # ------------------------------------------------------------------
 # Copiar src del workspace
 # ------------------------------------------------------------------
-COPY src /home/${USERNAME}/justina_hardware/src
+COPY src /home/${USERNAME}/Robotino/src
 
-RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/justina_hardware
+RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Robotino
 
 # ------------------------------------------------------------------
 # Compilar workspace
@@ -148,7 +148,7 @@ RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/justina_hardware
 #   y que las dependencias manuales arriba bastan
 # ------------------------------------------------------------------
 USER ${USERNAME}
-WORKDIR /home/${USERNAME}/justina_hardware
+WORKDIR /home/${USERNAME}/Robotino
 
 RUN source /opt/ros/jazzy/setup.bash && \
     colcon build --symlink-install --event-handlers console_direct+
@@ -162,7 +162,7 @@ RUN chmod +x /entrypoint.sh
 USER ${USERNAME}
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
-    echo "if [ -f /home/${USERNAME}/justina_hardware/install/setup.bash ]; then source /home/${USERNAME}/justina_hardware/install/setup.bash; fi" >> /home/${USERNAME}/.bashrc && \
+    echo "if [ -f /home/${USERNAME}/Robotino/install/setup.bash ]; then source /home/${USERNAME}/Robotino/install/setup.bash; fi" >> /home/${USERNAME}/.bashrc && \
     echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/${USERNAME}/.bashrc && \
     echo "export ROS_DOMAIN_ID=0" >> /home/${USERNAME}/.bashrc && \
     echo "export ROS_LOCALHOST_ONLY=0" >> /home/${USERNAME}/.bashrc && \
