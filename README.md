@@ -119,13 +119,14 @@ sudo apt install ros-jazzy-rmw-cyclonedds-cpp
 
 ### 8. Archivo de configuración DDS
 
-Cree el directorio de configuración si no existe:
+El archivo debe colocarse en `/etc/cyclonedds/cyclonedds.xml`. Como es una ruta del sistema, la creación requiere `sudo`:
 
 ```bash
-mkdir -p ~/.config/cyclonedds
+sudo mkdir -p /etc/cyclonedds
+sudo nano /etc/cyclonedds/cyclonedds.xml
 ```
 
-Cree el archivo `~/.config/cyclonedds/cyclonedds.xml` con el siguiente contenido:
+Pegue el siguiente contenido:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -161,17 +162,6 @@ ip link show
 
 ### 9. Activación del entorno
 
-Exporte las variables de entorno necesarias:
-
-```bash
-export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-export ROS_DOMAIN_ID=0
-export ROS_LOCALHOST_ONLY=0
-export CYCLONEDDS_URI=file://$HOME/.config/cyclonedds/cyclonedds.xml
-```
-
-O bien, si el alias del proyecto está configurado en su shell:
-
 ```bash
 justina_on
 ```
@@ -183,16 +173,9 @@ ros2 daemon stop && ros2 daemon start
 ros2 topic list
 ```
 
-Si los tópicos no aparecen, verifique que los puertos UDP no estén bloqueados por el firewall:
-
-```bash
-sudo ufw allow 7400/udp
-sudo ufw allow 7401/udp
-```
-
 ## Consideraciones importantes
 
-- La configuración DDS del robot (`docker/config/cyclonedds.xml`) usa broadcast de subred. Cualquier máquina en la red `172.27.1.0/24` con la configuración del paso 8 puede ver los tópicos de Robotino sin modificar archivos dentro del robot.
+- La configuración DDS del robot (`docker/config/cyclonedds.xml`) usa broadcast de subred. Cualquier máquina en la red `172.27.1.0/24` con el archivo `/etc/cyclonedds/cyclonedds.xml` del paso 8 puede ver los tópicos de Robotino sin modificar nada dentro del robot.
 - Asegúrese de que la computadora de trabajo y Robotino se encuentren dentro de la misma red y con conectividad funcional (`ping 172.27.1.1`).
 - El uso de `sudo` durante la construcción de la imagen puede ser necesario dependiendo de la configuración local de Docker.
 
