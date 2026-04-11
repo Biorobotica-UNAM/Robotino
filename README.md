@@ -33,7 +33,7 @@ Si se requiere trabajar con la version mas reciente de los paquetes contenidos e
 Ubique su terminal dentro del directorio `docker`:
 
 ```bash
-cd ~/justina_hardware/docker
+cd ~/Robotino/docker
 ```
 
 Si no tienes docker, instálalo con:
@@ -46,10 +46,10 @@ Construya y exporte la imagen con:
 sudo ./export_image.sh
 ```
 
-Este script genera la imagen `justina_hardware:jazzy` y produce el archivo:
+Este script genera la imagen `robotino:jazzy` y produce el archivo:
 
 ```bash
-justina_hardware_jazzy.tar.gz
+robotino_jazzy.tar.gz
 ```
 
 en la raiz del proyecto.
@@ -59,7 +59,7 @@ en la raiz del proyecto.
 Con el robot encendido y conectado a la misma red, transfiera el archivo al equipo Robotino:
 
 ```bash
-scp ~/justina_hardware/justina_hardware_jazzy.tar.gz robotino@robotino:~/
+scp ~/Robotino/robotino_jazzy.tar.gz robotino@robotino:~/
 ```
 
 ### 3. Acceso remoto al robot
@@ -79,7 +79,7 @@ Las instrucciones de esta seccion se realizan directamente dentro del robot.
 Importe la imagen transferida:
 
 ```bash
-docker load -i justina_hardware_jazzy.tar.gz
+docker load -i robotino_jazzy.tar.gz
 ```
 
 ### 5. Ejecucion del contenedor
@@ -96,7 +96,7 @@ docker run --rm -it \
   -e ROS_DOMAIN_ID=0 \
   -v /dev:/dev \
   -v /run/udev:/run/udev:ro \
-  justina_hardware:jazzy
+  robotino:jazzy
 ```
 
 Si se prefiere, puede utilizarse como referencia el script `docker/run_robotino.sh`, el cual contiene una variante del comando de arranque del contenedor.
