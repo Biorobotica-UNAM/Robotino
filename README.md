@@ -1,6 +1,6 @@
 # Robotino
 
-Este repositorio concentra la infraestructura necesaria para la construccion, despliegue y ejecucion del entorno de hardware de **JUSTINA** sobre **ROS 2 Jazzy**, con enfasis en la operacion del robot movil **Robotino**. Su objetivo es ofrecer un flujo de trabajo claro y reproducible para generar la imagen Docker del sistema, transferirla al robot y poner en marcha los nodos de hardware correspondientes.
+Este repositorio concentra la infraestructura necesaria para la construcción, despliegue y ejecución del entorno de hardware de **JUSTINA** sobre **ROS 2 Jazzy**, con énfasis en la operación del robot móvil **Robotino**. Su objetivo es ofrecer un flujo de trabajo claro y reproducible para generar la imagen Docker del sistema, transferirla al robot y poner en marcha los nodos de hardware correspondientes.
 
 ## Objetivo
 
@@ -11,24 +11,24 @@ El procedimiento descrito en este documento permite:
 - transferirla al robot Robotino;
 - cargar y ejecutar el contenedor en el robot;
 - lanzar la infraestructura ROS 2 asociada al hardware;
-- configurar la comunicacion DDS desde la computadora de trabajo.
+- configurar la comunicación DDS desde cualquier computadora de trabajo sin necesidad de registrar su IP en el robot.
 
 ## Estructura relevante
 
 Los archivos principales involucrados en este flujo son los siguientes:
 
 - `docker/export_image.sh`: construye la imagen Docker y genera el archivo comprimido para su transferencia.
-- `docker/run_robotino.sh`: ejecuta el contenedor con la configuracion necesaria para acceder al hardware del robot.
-- `docker/config/cyclonedds.xml`: archivo de configuracion de DDS que debe revisarse antes de operar desde la computadora.
+- `docker/run_robotino.sh`: ejecuta el contenedor con la configuración necesaria para acceder al hardware del robot.
+- `docker/config/cyclonedds.xml`: configuración DDS embebida en la imagen del robot. Anuncia su presencia a toda la subred mediante broadcast.
 - `src/justina_hardware/launch/hardware.launch.xml`: launch principal para el arranque de los nodos de hardware.
 
 ## Procedimiento de despliegue
 
-### 0. Actualizacion opcional del workspace
+### 0. Actualización opcional del workspace
 
-Si se requiere trabajar con la version mas reciente de los paquetes contenidos en `src`, actualice previamente los repositorios correspondientes.
+Si se requiere trabajar con la versión más reciente de los paquetes contenidos en `src`, actualice previamente los repositorios correspondientes.
 
-### 1. Construccion de la imagen Docker
+### 1. Construcción de la imagen Docker
 
 Ubique su terminal dentro del directorio `docker`:
 
@@ -36,9 +36,11 @@ Ubique su terminal dentro del directorio `docker`:
 cd ~/Robotino/docker
 ```
 
-Si no tienes docker, instálalo con:
+Si no tiene Docker instalado:
 
+```bash
 sudo apt install docker.io
+```
 
 Construya y exporte la imagen con:
 
@@ -46,13 +48,7 @@ Construya y exporte la imagen con:
 sudo ./export_image.sh
 ```
 
-Este script genera la imagen `robotino:jazzy` y produce el archivo:
-
-```bash
-robotino_jazzy.tar.gz
-```
-
-en la raiz del proyecto.
+Este script genera la imagen `robotino:jazzy` y produce el archivo `robotino_jazzy.tar.gz` en la raíz del proyecto.
 
 ### 2. Transferencia de la imagen al robot
 
@@ -64,15 +60,15 @@ scp ~/Robotino/robotino_jazzy.tar.gz robotino@robotino:~/
 
 ### 3. Acceso remoto al robot
 
-Establezca una sesion SSH con el robot:
+Establezca una sesión SSH con el robot:
 
 ```bash
 ssh robotino@robotino
 ```
 
-## Ejecucion en Robotino
+## Ejecución en Robotino
 
-Las instrucciones de esta seccion se realizan directamente dentro del robot.
+Las instrucciones de esta sección se realizan directamente dentro del robot.
 
 ### 4. Carga de la imagen Docker
 
@@ -82,7 +78,7 @@ Importe la imagen transferida:
 docker load -i robotino_jazzy.tar.gz
 ```
 
-### 5. Ejecucion del contenedor
+### 5. Ejecución del contenedor
 
 Una vez cargada la imagen, inicie el contenedor con:
 
@@ -99,7 +95,7 @@ docker run --rm -it \
   robotino:jazzy
 ```
 
-Si se prefiere, puede utilizarse como referencia el script `docker/run_robotino.sh`, el cual contiene una variante del comando de arranque del contenedor.
+Si se prefiere, puede utilizarse el script `docker/run_robotino.sh`, el cual contiene una variante del comando de arranque del contenedor.
 
 ### 6. Lanzamiento del hardware
 
@@ -109,26 +105,105 @@ Dentro del contenedor, ejecute el launch principal del hardware:
 ros2 launch justina_hardware hardware.launch.xml
 ```
 
-## Configuracion desde la computadora de trabajo
+## Configuración desde la computadora de trabajo
 
-Una vez que el contenedor se encuentre en ejecucion en Robotino, regrese a la computadora de trabajo y configure el entorno DDS correspondiente.
+Una vez que el contenedor se encuentre en ejecución en Robotino, regrese a su computadora y configure el entorno DDS. **No es necesario registrar la IP de su máquina en el robot** — Robotino anuncia su presencia a toda la subred automáticamente.
 
-### 7. Activacion de la configuracion local
+### 7. Requisitos
 
-Ejecute el alias:
+Si no tiene el middleware de Cyclone DDS instalado:
+
+```bash
+sudo apt install ros-jazzy-rmw-cyclonedds-cpp
+```
+
+### 8. Archivo de configuración DDS
+
+Cree el directorio de configuración si no existe:
+
+```bash
+mkdir -p ~/.config/cyclonedds
+```
+
+Cree el archivo `~/.config/cyclonedds/cyclonedds.xml` con el siguiente contenido:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any">
+    <General>
+      <Interfaces>
+        <NetworkInterface name="YOUR_INTERFACE"/>
+      </Interfaces>
+      <AllowMulticast>false</AllowMulticast>
+      <MaxMessageSize>65500B</MaxMessageSize>
+    </General>
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>
+      <Peers>
+        <Peer address="172.27.1.1"/>
+        <Peer address="172.27.1.255"/>
+      </Peers>
+    </Discovery>
+  </Domain>
+</CycloneDDS>
+```
+
+Sustituya `YOUR_INTERFACE` por el nombre de su interfaz de red conectada a Robotino. Para identificarla:
+
+```bash
+ip link show
+# Ejemplos comunes: eno1, eno2, eth0, enp3s0
+```
+
+> El peer `172.27.1.255` es la dirección de broadcast de la subred `/24`. Permite que Robotino sea descubierto por cualquier máquina en la red sin necesidad de registrar su IP en el robot.
+
+### 9. Activación del entorno
+
+Exporte las variables de entorno necesarias:
+
+```bash
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export ROS_DOMAIN_ID=0
+export ROS_LOCALHOST_ONLY=0
+export CYCLONEDDS_URI=file://$HOME/.config/cyclonedds/cyclonedds.xml
+```
+
+O bien, si el alias del proyecto está configurado en su shell:
 
 ```bash
 justina_on
 ```
 
-Este paso prepara los archivos de configuracion necesarios para la comunicacion mediante DDS.
+### 10. Verificación
+
+```bash
+ros2 daemon stop && ros2 daemon start
+ros2 topic list
+```
+
+Si los tópicos no aparecen, verifique que los puertos UDP no estén bloqueados por el firewall:
+
+```bash
+sudo ufw allow 7400/udp
+sudo ufw allow 7401/udp
+```
 
 ## Consideraciones importantes
 
-- Verifique que la direccion IP definida en `/cyclonedds.xml` corresponda a la de su computadora.
-- Asegurese de que la computadora de trabajo y Robotino se encuentren dentro de la misma red y con conectividad funcional.
-- El uso de `sudo` durante la construccion de la imagen puede ser necesario dependiendo de la configuracion local de Docker.
+- La configuración DDS del robot (`docker/config/cyclonedds.xml`) usa broadcast de subred. Cualquier máquina en la red `172.27.1.0/24` con la configuración del paso 8 puede ver los tópicos de Robotino sin modificar archivos dentro del robot.
+- Asegúrese de que la computadora de trabajo y Robotino se encuentren dentro de la misma red y con conectividad funcional (`ping 172.27.1.1`).
+- El uso de `sudo` durante la construcción de la imagen puede ser necesario dependiendo de la configuración local de Docker.
 
 ## Resumen operativo
 
-En terminos generales, el flujo de trabajo consiste en construir la imagen del entorno de hardware, transferirla al robot, ejecutarla dentro de Robotino y finalmente habilitar la comunicacion DDS desde la computadora de trabajo. Siguiendo esta secuencia, es posible desplegar de manera ordenada y reproducible la infraestructura base de hardware de JUSTINA.
+```
+[Computadora] ./export_image.sh → robotino_jazzy.tar.gz
+     │
+     └─ scp → [Robotino] docker load → docker run → ros2 launch hardware.launch.xml
+                                                              │
+[Computadora] justina_on → ros2 topic list ←─────────────────┘
+```
+
+El flujo consiste en construir la imagen del entorno de hardware, transferirla al robot, ejecutarla dentro de Robotino y habilitar la comunicación DDS desde la computadora de trabajo. Siguiendo esta secuencia, cualquier miembro del equipo puede conectarse a Robotino configurando únicamente el nombre de su interfaz de red local.
