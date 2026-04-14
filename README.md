@@ -78,7 +78,18 @@ Importe la imagen transferida:
 docker load -i robotino_jazzy.tar.gz
 ```
 
-### 5. Ejecución del contenedor
+### 5. Configuración previa para acceso al display
+
+Antes de ejecutar el contenedor, es necesario habilitar el acceso al servidor gráfico (display) del sistema.
+Ejecute los siguientes comandos en la terminal del robot:
+
+```bash
+export DISPLAY=:0
+xhost +
+```
+Estos comandos permiten que el contenedor Docker tenga permisos para mostrar interfaces gráficas en el display del robot.
+
+### 6. Ejecución del contenedor
 
 Una vez cargada la imagen, inicie el contenedor con:
 
@@ -97,7 +108,7 @@ docker run --rm -it \
 
 Si se prefiere, puede utilizarse el script `docker/run_robotino.sh`, el cual contiene una variante del comando de arranque del contenedor.
 
-### 6. Lanzamiento del hardware
+### 7. Lanzamiento del hardware
 
 Dentro del contenedor, ejecute el launch principal del hardware:
 
@@ -109,7 +120,7 @@ ros2 launch justina_hardware hardware.launch.xml
 
 Una vez que el contenedor se encuentre en ejecución en Robotino, regrese a su computadora y configure el entorno DDS. **No es necesario registrar la IP de su máquina en el robot** — Robotino anuncia su presencia a toda la subred automáticamente.
 
-### 7. Requisitos
+### 8. Requisitos
 
 Si no tiene el middleware de Cyclone DDS instalado:
 
@@ -117,7 +128,7 @@ Si no tiene el middleware de Cyclone DDS instalado:
 sudo apt install ros-jazzy-rmw-cyclonedds-cpp
 ```
 
-### 8. Archivo de configuración DDS
+### 9. Archivo de configuración DDS
 
 El archivo debe colocarse en `/etc/cyclonedds/cyclonedds.xml`. Como es una ruta del sistema, la creación requiere `sudo`:
 
@@ -160,7 +171,7 @@ ip link show
 
 > El peer `172.27.1.255` es la dirección de broadcast de la subred `/24`. Permite que Robotino sea descubierto por cualquier máquina en la red sin necesidad de registrar su IP en el robot.
 
-### 9. Activación del entorno
+### 10. Activación del entorno
 
 Utilice el alias:
 
@@ -170,7 +181,7 @@ alias justina_on='export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp; export CYCLONEDD
 justina_on
 ```
 
-### 10. Verificación
+### 11. Verificación
 
 ```bash
 ros2 daemon stop && ros2 daemon start
