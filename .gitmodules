@@ -5,7 +5,7 @@
 [submodule "src/base"]
 	path = src/base
 	url = git@github.com:Biorobotica-UNAM/base.git
-	branch = main
+	branch = dev/stop_node
 [submodule "src/gui"]
 	path = src/gui
 	url = git@github.com:Biorobotica-UNAM/gui.git
