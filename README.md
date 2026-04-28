@@ -164,11 +164,19 @@ ip link show
 
 Utilice el alias:
 
+```bash
 alias justina_on='export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp; export CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml; export ROS_DOMAIN_ID=0; export ROS_LOCALHOST_ONLY=0'
+```
+
+justina_on
 
 ```bash
-justina_on
+alias justina_off='unset CYCLONEDDS_URI; unset RMW_IMPLEMENTATION; unset ROS_DOMAIN_ID; unset ROS_LOCALHOST_ONLY'
 ```
+
+justina_off
+
+
 
 ### 10. Verificación
 
