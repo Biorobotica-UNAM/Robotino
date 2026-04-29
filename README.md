@@ -171,7 +171,7 @@ alias justina_on='export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp; export CYCLONEDD
 justina_on
 
 ```bash
-alias justina_off='unset CYCLONEDDS_URI; unset RMW_IMPLEMENTATION; unset ROS_DOMAIN_ID; unset ROS_LOCALHOST_ONLY'
+alias justina_off='unset CYCLONEDDS_URI; unset RMW_IMPLEMENTATION; unset ROS_DOMAIN_ID; unset ROS_LOCALHOST_ONLY && pkill -9 -f _node && pkill -9 -f ros2 && ros2 daemon start'
 ```
 
 justina_off
