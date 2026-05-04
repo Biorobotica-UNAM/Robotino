@@ -34,3 +34,6 @@
 	path = src/joint_states_parser
 	url = git@github.com:Biorobotica-UNAM/joint_states_parser.git
 	branch = main
+[submodule "src/grippers"]
+	path = src/grippers
+	url = git@github.com:Biorobotica-UNAM/grippers.git
