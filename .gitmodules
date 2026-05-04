@@ -37,3 +37,4 @@
 [submodule "src/grippers"]
 	path = src/grippers
 	url = git@github.com:Biorobotica-UNAM/grippers.git
+	branch = dev/joint_states_publisher
