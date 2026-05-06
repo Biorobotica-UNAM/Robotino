@@ -166,7 +166,10 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/${USERNAME}/.bashrc && \
     echo "export ROS_DOMAIN_ID=0" >> /home/${USERNAME}/.bashrc && \
     echo "export ROS_LOCALHOST_ONLY=0" >> /home/${USERNAME}/.bashrc && \
-    echo "export CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml" >> /home/${USERNAME}/.bashrc
+    echo "export CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml" >> /home/${USERNAME}/.bashrc && \
+    echo "alias cb='colcon build --symlink-install'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias sisb='source install/setup.bash'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias robotino_start='ros2 launch justina_hardware hardware.launch.xml'" >> /home/${USERNAME}/.bashrc
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
