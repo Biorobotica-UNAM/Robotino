@@ -1,40 +1,40 @@
-[submodule "src/arms"]
-	path = src/arms
+[submodule "src/Hardware/arms"]
+	path = src/Hardware/arms
 	url = git@github.com:Biorobotica-UNAM/arms.git
 	branch = main
-[submodule "src/base"]
-	path = src/base
+[submodule "src/Hardware/base"]
+	path = src/Hardware/base
 	url = git@github.com:Biorobotica-UNAM/base.git
 	branch = main
-[submodule "src/gui"]
-	path = src/gui
+[submodule "src/HRI/gui"]
+	path = src/HRI/gui
 	url = git@github.com:Biorobotica-UNAM/gui.git
 	branch = main
-[submodule "src/head"]
-	path = src/head
+[submodule "src/Hardware/head"]
+	path = src/Hardware/head
 	url = git@github.com:Biorobotica-UNAM/head.git
 	branch = main
 [submodule "src/Interfaces"]
 	path = src/Interfaces
 	url = git@github.com:Biorobotica-UNAM/Interfaces.git
 	branch = main
-[submodule "src/justina_description"]
-	path = src/justina_description
+[submodule "src/Hardware/justina_description"]
+	path = src/Hardware/justina_description
 	url = git@github.com:Biorobotica-UNAM/justina_description.git
 	branch = main
-[submodule "src/torso"]
-	path = src/torso
+[submodule "src/Hardware/torso"]
+	path = src/Hardware/torso
 	url = git@github.com:Biorobotica-UNAM/torso.git
 	branch = main
-[submodule "src/justina_hardware"]
-	path = src/justina_hardware
+[submodule "src/Hardware/justina_hardware"]
+	path = src/Hardware/justina_hardware
 	url = git@github.com:Biorobotica-UNAM/justina_hardware.git
 	branch = main
-[submodule "src/joint_states_parser"]
-	path = src/joint_states_parser
+[submodule "src/Hardware/joint_states_parser"]
+	path = src/Hardware/joint_states_parser
 	url = git@github.com:Biorobotica-UNAM/joint_states_parser.git
 	branch = main
-[submodule "src/grippers"]
-	path = src/grippers
+[submodule "src/Hardware/grippers"]
+	path = src/Hardware/grippers
 	url = git@github.com:Biorobotica-UNAM/grippers.git
 	branch = main
