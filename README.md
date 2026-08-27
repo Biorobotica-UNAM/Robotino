@@ -136,7 +136,7 @@ Pegue el siguiente contenido:
       <Interfaces>
         <NetworkInterface name="YOUR_INTERFACE"/>
       </Interfaces>
-      <AllowMulticast>false</AllowMulticast>
+      <AllowMulticast>true</AllowMulticast>
       <MaxMessageSize>65500B</MaxMessageSize>
     </General>
     <Discovery>
